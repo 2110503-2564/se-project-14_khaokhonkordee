@@ -1,4 +1,5 @@
 // app/api/proxy-roomtype/[hotelId]/route.ts
+import { API_ENDPOINTS } from "@/config/api";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -18,14 +19,15 @@ export async function GET(
   const page = req.nextUrl.searchParams.get("page") || "1";
   const limit = req.nextUrl.searchParams.get("limit") || "10";
 
-  const backendUrl = `https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/hotel/${hotelId}?page=${page}&limit=${limit}`;
-
-  const res = await fetch(backendUrl, {
-    method: "GET",
-    headers: {
-      Authorization: formattedToken || "",
-    },
-  });
+  const res = await fetch(
+    API_ENDPOINTS.ROOMTYPE.BY_HOTEL_WITH_PAGE(hotelId, page, limit),
+    {
+      method: "GET",
+      headers: {
+        Authorization: formattedToken || "",
+      },
+    }
+  );
 
   if (res.status === 404) {
     return NextResponse.json({ data: [], count: 0 }, { status: 200 });

@@ -2,67 +2,45 @@
 // export const API_BASE_URL = 'https://cozy-hotel-se-be.vercel.app/';
 export const API_BASE_URL =
   process.env.NODE_ENV === "development"
-    ? "" // Use proxy route in development
+    ? "http://localhost:5000"
     : "https://cozy-hotel-se-be.vercel.app";
 
 // API endpoints
 export const API_ENDPOINTS = {
   // Auth
   AUTH: {
-    LOGIN:
-      process.env.NODE_ENV === "development"
-        ? "/api/proxy-auth-login"
-        : `${API_BASE_URL}/api/v1/auth/login`,
-    REGISTER:
-      process.env.NODE_ENV === "development"
-        ? "/api/proxy-auth-register"
-        : `${API_BASE_URL}/api/v1/auth/register`,
+    LOGIN: `${API_BASE_URL}/api/v1/auth/login`,
+    REGISTER: `${API_BASE_URL}/api/v1/auth/register`,
     ME: `${API_BASE_URL}/api/v1/auth/me`,
   },
-  // Hotels
-  // HOTELS: {
-  //   BASE: `${API_BASE_URL}/api/v1/hotels`,
-  //   BY_ID: (id: string) => `${API_BASE_URL}/api/v1/hotels/${id}`,
-  //   BOOKINGS: (hotelId: string) => `${API_BASE_URL}/api/v1/hotels/${hotelId}/bookings`,
-  // },
+
+  //Hotel
   HOTELS: {
-    BASE:
-      process.env.NODE_ENV === "development"
-        ? "/api/proxy-hotels"
-        : `${API_BASE_URL}/api/v1/hotels`,
+    BASE: `${API_BASE_URL}/api/v1/hotels`,
     BY_ID: (id: string) => `${API_BASE_URL}/api/v1/hotels/${id}`,
-    BOOKINGS: (hotelId: string) =>
-      process.env.NODE_ENV === "development"
-        ? `/api/proxy-hotel-booking/${hotelId}`
-        : `${API_BASE_URL}/api/v1/hotels/${hotelId}/bookings`,
+    WITH_PAGE: (page: string, limit: string) => `${API_BASE_URL}/api/v1/hotels?page=${page}&limit=${limit}`,
   },
+
+  //ROOMTYPE
   ROOMTYPE: {
-    BY_ID: (id: string) =>
-       process.env.NODE_ENV === "development"
-      ? `/api/proxy-roomtype/${id}`
-      : `${API_BASE_URL}/api/v1/roomtypes/hotel/${id}`,
+    BASE: `${API_BASE_URL}/api/v1/roomtypes/`,
+    BY_ID: (id: string) => `${API_BASE_URL}/api/v1/roomtypes/${id}`,
+    BY_HOTEL : (hotelId:string)=> `${API_BASE_URL}/roomtypes/hotel/${hotelId}`,
+    BY_HOTEL_WITH_PAGE: (hotelId : string, page: string, limit: string) => `${API_BASE_URL}/api/v1/roomtypes/hotel/${hotelId}?page=${page}&limit=${limit}`
   },
+
   // Accounts
   ACCOUNTS: {
-    BASE:
-      process.env.NODE_ENV === "development"
-        ? "/api/proxy-users"
-        : `${API_BASE_URL}/api/v1/accounts`,
+    BASE: `${API_BASE_URL}/api/v1/accounts`,
     BY_ID: (userId: string) => `${API_BASE_URL}/api/v1/accounts/${userId}`,
   },
+
   // Bookings
   BOOKINGS: {
-    BASE:
-      process.env.NODE_ENV === "development"
-        ? "/api/proxy-hotel-booking"
-        : `${API_BASE_URL}/api/v1/bookings`,
+    BASE: `${API_BASE_URL}/api/v1/bookings`,
     BY_HOTEL: (hotelId: string) =>
-      process.env.NODE_ENV === "development"
-        ? `/api/proxy-hotel-booking/${hotelId}`
-        : `${API_BASE_URL}/api/v1/hotels/${hotelId}/bookings`,
+      `${API_BASE_URL}/api/v1/hotels/${hotelId}/bookings`,
     BY_ID: (bookingId: string) =>
-      process.env.NODE_ENV === "development"
-        ? `/api/proxy-booking/${bookingId}`
-        : `${API_BASE_URL}/api/v1/bookings/${bookingId}`,
+      `${API_BASE_URL}/api/v1/bookings/${bookingId}`,
   },
 };

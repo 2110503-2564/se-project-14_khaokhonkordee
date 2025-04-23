@@ -1,13 +1,16 @@
 // app/api/proxy-hotel-booking/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { API_ENDPOINTS } from "@/config/api";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const token = req.headers.get('authorization');
-  const formattedToken = token?.startsWith('Bearer ') ? token : `Bearer ${token}`;
+  const token = req.headers.get("authorization");
+  const formattedToken = token?.startsWith("Bearer ")
+    ? token
+    : `Bearer ${token}`;
 
-  const res = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/bookings`, {
+  const res = await fetch(API_ENDPOINTS.BOOKINGS.BASE, {
     headers: {
-      Authorization: formattedToken || '',
+      Authorization: formattedToken || "",
     },
   });
 

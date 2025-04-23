@@ -1,5 +1,7 @@
+import { API_BASE_URL } from "@/config/api";
+
 export default async function deleteBooking(bookingId: string, token: string) {
-    const response = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/bookings/${bookingId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/bookings/${bookingId}`, {
         method: 'DELETE',
         headers: {
             'authorization': `Bearer ${token}`,

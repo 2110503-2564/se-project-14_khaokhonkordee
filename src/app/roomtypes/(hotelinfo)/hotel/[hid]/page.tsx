@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import createBooking from "@/libs/booking/createBooking"; // Make sure this path is correct
+import { API_BASE_URL } from "@/config/api";
 
 type RoomType = {
   _id: string;
@@ -37,7 +38,7 @@ export default function SelectRoomPage() {
       if (!hid) return;
 
       try {
-        const res = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/hotel/${hid}`);
+        const res = await fetch(`${API_BASE_URL}/api/v1/roomtypes/hotel/${hid}`);
         const data = await res.json();
         setRoomTypes(data.data || []);
       } catch (err) {

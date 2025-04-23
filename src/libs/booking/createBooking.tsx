@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/config/api";
+
 export default async function createBooking(
   hotelId: string,
   bookingData: {
@@ -24,7 +26,7 @@ export default async function createBooking(
 
   const requestUrl = isDev
     ? `/api/proxy-hotel-booking/${hotelId}`
-    : `https://cozy-hotel-se-be.vercel.app/api/v1/hotels/${hotelId}/bookings`;
+    : `${API_BASE_URL}/api/v1/hotels/${hotelId}/bookings`;
 
   console.log("Request URL:", requestUrl);
   console.log("Request Body:", requestBody);

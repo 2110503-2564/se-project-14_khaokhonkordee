@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config/api';
 import { Booking } from '@/types';
 
 export default async function editBooking(
@@ -9,7 +10,7 @@ export default async function editBooking(
   token: string
 ): Promise<Booking> {
   const response = await fetch(
-    `https://cozy-hotel-se-be.vercel.app/api/v1/bookings/${bookingId}`,
+    `${API_BASE_URL}/api/v1/bookings/${bookingId}`,
     {
       method: 'PUT',
       headers: {

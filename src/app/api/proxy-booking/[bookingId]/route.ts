@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/config/api";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -11,15 +12,12 @@ export async function GET(
     : `Bearer ${token}`;
 
   try {
-    const res = await fetch(
-      `https://cozy-hotel-se-be.vercel.app/api/v1/bookings/${bookingId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: formattedToken || "",
-        },
-      }
-    );
+    const res = await fetch(API_ENDPOINTS.BOOKINGS.BY_ID(bookingId), {
+      method: "GET",
+      headers: {
+        Authorization: formattedToken || "",
+      },
+    });
 
     const data = await res.json();
 

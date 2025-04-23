@@ -9,9 +9,7 @@ export default async function userLogIn(
 
     const isServer = typeof window === 'undefined';
 
-    const url = isServer && process.env.NODE_ENV === 'development'
-      ? `http://localhost:3000${API_ENDPOINTS.AUTH.LOGIN}`
-      : API_ENDPOINTS.AUTH.LOGIN;
+    const url = API_ENDPOINTS.AUTH.LOGIN;
 
     const response = await fetch(url, {
       method: 'POST',

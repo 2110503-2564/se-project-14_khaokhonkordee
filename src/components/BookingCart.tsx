@@ -8,7 +8,7 @@ import deleteBooking from "@/libs/booking/deleteBooking";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SearchBar from './SearchBar';
-import { API_ENDPOINTS } from "@/config/api";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
 import { RoomType } from '@/types';
 
 interface Booking {
@@ -168,7 +168,7 @@ export default function ReservationCart() {
         return;
       }
 
-      const roomRes = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/${roomTypeId}`);
+      const roomRes = await fetch(`${API_BASE_URL}/api/v1/roomtypes/${roomTypeId}`);
       const roomData = await roomRes.json();
 
       setSelectedRoomType(roomData.data);

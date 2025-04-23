@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config/api';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
@@ -5,7 +6,7 @@ export async function GET(req: NextRequest) {
   const page = searchParams.get('page') || '1';
   const limit = searchParams.get('limit') || '6';
 
-  const targetUrl = `https://cozy-hotel-se-be.vercel.app/api/v1/hotels?page=${page}&limit=${limit}`;
+  const targetUrl = API_BASE_URL + `/api/v1/hotels?page=${page}&limit=${limit}`;
 
   const response = await fetch(targetUrl);
   const data = await response.json();

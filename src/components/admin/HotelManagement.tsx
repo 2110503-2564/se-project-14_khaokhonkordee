@@ -12,6 +12,7 @@ import editBooking from '@/libs/booking/editBooking';
 import { Hotel, HotelUpdate, Booking, RoomType, RoomTypeFormData } from '@/types';
 import LoadingSpinner from './LoadingSpinner';
 import SearchBar from '../SearchBar';
+import { API_BASE_URL } from '@/config/api';
 
 export default function HotelManagement() {
   const { data: session } = useSession();
@@ -422,7 +423,7 @@ export default function HotelManagement() {
     console.log('Payload ที่ส่งไป:', payload);
 
     try {
-      const response = await fetch('https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/roomtypes`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,
@@ -508,7 +509,7 @@ export default function HotelManagement() {
         isAvailable: roomTypeEditingFormData.isAvailable,
       };
 
-      const response = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/${editingRoomType._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/roomtypes/${editingRoomType._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,
@@ -558,7 +559,7 @@ export default function HotelManagement() {
         isAvailable: false,
       };
 
-      const response = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/${room._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/roomtypes/${room._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,
@@ -599,7 +600,7 @@ export default function HotelManagement() {
         isAvailable: true,
       };
 
-      const response = await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/${room._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/roomtypes/${room._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,
@@ -623,7 +624,7 @@ export default function HotelManagement() {
     if (!session?.user?.token) return;
 
     try {
-      await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/roomtypes/${roomId}`, {
+      await fetch(`${API_BASE_URL}/api/v1/roomtypes/${roomId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,
@@ -745,7 +746,7 @@ export default function HotelManagement() {
 
     setIsDeletingBooking(true);
     try {
-      await fetch(`https://cozy-hotel-se-be.vercel.app/api/v1/bookings/${bookingToDelete._id}`, {
+      await fetch(`${API_BASE_URL}/api/v1/bookings/${bookingToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,

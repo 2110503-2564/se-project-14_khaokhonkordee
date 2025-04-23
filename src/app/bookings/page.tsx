@@ -5,15 +5,16 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import createBooking from "@/libs/booking/createBooking";
-import getBookings from '@/libs/booking/getBookings';
-import { Booking } from '@/types';
-import LoadingSpinner from '@/components/admin/LoadingSpinner';
+import getBookings from "@/libs/booking/getBookings";
+import { Booking } from "@/types";
+import LoadingSpinner from "@/components/admin/LoadingSpinner";
+import { API_ENDPOINTS } from "@/config/api";
 
 export default function Reservations() {
   const urlParams = useSearchParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const cid = urlParams.get("id");
+  const hid = urlParams.get("id");
   const [hotelName, setHotelName] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -24,26 +25,26 @@ export default function Reservations() {
   const itemsPerPage = 6; // Match backend pagination
 
   // Admin search states
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchDateRange, setSearchDateRange] = useState<{
     start: string | null;
     end: string | null;
   }>({
     start: null,
-    end: null
+    end: null,
   });
-  const [sortField, setSortField] = useState<'checkinDate' | 'checkoutDate' | 'createdAt'>('checkinDate');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [searchBookingId, setSearchBookingId] = useState('');
+  const [sortField, setSortField] = useState<
+    "checkinDate" | "checkoutDate" | "createdAt"
+  >("checkinDate");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [searchBookingId, setSearchBookingId] = useState("");
 
   useEffect(() => {
     const fetchHotelName = async () => {
-      if (cid) {
+      if (hid) {
         try {
-          console.log("Fetching hotel with ID:", cid);
-          const response = await fetch(
-            `https://cozyhotel-be.vercel.app/api/v1/hotels/${cid}`
-          );
+          console.log("Fetching hotel with ID:", hid);
+          const response = await fetch(API_ENDPOINTS.HOTELS.BY_ID(hid));
           console.log("Response status:", response.status);
 
           if (response.ok) {
@@ -67,7 +68,7 @@ export default function Reservations() {
     };
 
     fetchHotelName();
-  }, [cid]);
+  }, [hid]);
 
   useEffect(() => {
     console.log("hotelName changed to:", hotelName);
@@ -91,38 +92,43 @@ export default function Reservations() {
     }
     try {
       setLoading(true);
-      const response = await getBookings(session.user.token, currentPage, itemsPerPage);
+      const response = await getBookings(
+        session.user.token,
+        currentPage,
+        itemsPerPage
+      );
       setBookings(response.data);
       setTotalItems(response.count);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error("Error fetching bookings:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const clearSearchFields = () => {
-    setSearchTerm('');
-    setSearchBookingId('');
+    setSearchTerm("");
+    setSearchBookingId("");
     setSearchDateRange({
       start: null,
-      end: null
+      end: null,
     });
-    setSortField('checkinDate');
-    setSortDirection('asc');
+    setSortField("checkinDate");
+    setSortDirection("asc");
   };
 
   const filteredBookings = bookings
-    .filter(booking => {
-      const guestName = typeof booking.user === 'object' && booking.user.name 
-        ? booking.user.name.toLowerCase() 
-        : '';
-      
-      const matchesGuestName = searchTerm 
+    .filter((booking) => {
+      const guestName =
+        typeof booking.user === "object" && booking.user.name
+          ? booking.user.name.toLowerCase()
+          : "";
+
+      const matchesGuestName = searchTerm
         ? guestName.includes(searchTerm.toLowerCase())
         : true;
-      
-      const matchesBookingId = searchBookingId 
+
+      const matchesBookingId = searchBookingId
         ? booking._id.toLowerCase().includes(searchBookingId.toLowerCase())
         : true;
 
@@ -132,8 +138,9 @@ export default function Reservations() {
         const bookingEnd = new Date(booking.checkoutDate);
         const searchStart = new Date(searchDateRange.start);
         const searchEnd = new Date(searchDateRange.end);
-        
-        matchesDateRange = bookingStart >= searchStart && bookingEnd <= searchEnd;
+
+        matchesDateRange =
+          bookingStart >= searchStart && bookingEnd <= searchEnd;
       }
 
       return matchesGuestName && matchesBookingId && matchesDateRange;
@@ -141,24 +148,28 @@ export default function Reservations() {
     .sort((a, b) => {
       const dateA = new Date(a[sortField]);
       const dateB = new Date(b[sortField]);
-      return sortDirection === 'asc' 
+      return sortDirection === "asc"
         ? dateA.getTime() - dateB.getTime()
         : dateB.getTime() - dateA.getTime();
     });
 
-  const Pagination = ({ totalItems, currentPage, onPageChange }: { 
-    totalItems: number; 
-    currentPage: number; 
+  const Pagination = ({
+    totalItems,
+    currentPage,
+    onPageChange,
+  }: {
+    totalItems: number;
+    currentPage: number;
     onPageChange: (page: number) => void;
   }) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
+
     if (totalPages <= 1) return null;
 
     const getPageNumbers = () => {
       const pages = [];
       const maxVisiblePages = 5;
-      
+
       if (totalPages <= maxVisiblePages) {
         for (let i = 1; i <= totalPages; i++) {
           pages.push(i);
@@ -175,7 +186,8 @@ export default function Reservations() {
         } else {
           pages.push(1);
           pages.push(-1); // Ellipsis
-          for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+          for (let i = currentPage - 1; i <= currentPage + 1; i++)
+            pages.push(i);
           pages.push(-1); // Ellipsis
           pages.push(totalPages);
         }
@@ -189,37 +201,45 @@ export default function Reservations() {
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={`px-4 py-2 rounded-lg font-serif text-sm
-            ${currentPage === 1 
-              ? 'bg-[#2A2A2A] text-gray-500 cursor-not-allowed' 
-              : 'bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors'}`}
+            ${
+              currentPage === 1
+                ? "bg-[#2A2A2A] text-gray-500 cursor-not-allowed"
+                : "bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors"
+            }`}
         >
           Previous
         </button>
-        
-        {getPageNumbers().map((pageNum, idx) => (
+
+        {getPageNumbers().map((pageNum, idx) =>
           pageNum === -1 ? (
-            <span key={`ellipsis-${idx}`} className="text-gray-500">...</span>
+            <span key={`ellipsis-${idx}`} className="text-gray-500">
+              ...
+            </span>
           ) : (
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
               className={`w-10 h-10 rounded-lg font-serif text-sm
-                ${currentPage === pageNum
-                  ? 'bg-[#C9A55C] text-white'
-                  : 'bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors'}`}
+                ${
+                  currentPage === pageNum
+                    ? "bg-[#C9A55C] text-white"
+                    : "bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors"
+                }`}
             >
               {pageNum}
             </button>
           )
-        ))}
-        
+        )}
+
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === Math.ceil(totalItems / itemsPerPage)}
           className={`px-4 py-2 rounded-lg font-serif text-sm
-            ${currentPage === Math.ceil(totalItems / itemsPerPage)
-              ? 'bg-[#2A2A2A] text-gray-500 cursor-not-allowed' 
-              : 'bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors'}`}
+            ${
+              currentPage === Math.ceil(totalItems / itemsPerPage)
+                ? "bg-[#2A2A2A] text-gray-500 cursor-not-allowed"
+                : "bg-[#2A2A2A] text-[#C9A55C] hover:bg-[#333333] transition-colors"
+            }`}
         >
           Next
         </button>
@@ -234,7 +254,7 @@ export default function Reservations() {
       return;
     }
 
-    if (cid && pickupDate && returnDate) {
+    if (hid && pickupDate && returnDate) {
       if (returnDate.isBefore(pickupDate)) {
         alert("Check-out date must be after check-in date");
         return;
@@ -243,7 +263,7 @@ export default function Reservations() {
       setIsLoading(true);
       try {
         console.log("Making reservation with data:", {
-          cid,
+          hid,
           dates: {
             checkinDate: dayjs(pickupDate).format("YYYY/MM/DD"),
             checkoutDate: dayjs(returnDate).format("YYYY/MM/DD"),
@@ -252,12 +272,12 @@ export default function Reservations() {
         });
 
         await createBooking(
-          cid,
+          hid,
           {
             startDate: dayjs(pickupDate).format("YYYY-MM-DD"),
             endDate: dayjs(returnDate).format("YYYY-MM-DD"),
             user: session.user._id,
-            roomType: ""
+            roomType: "",
           },
           session.user.token
         );
@@ -289,9 +309,13 @@ export default function Reservations() {
     return (
       <main className="w-full min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center">
         <div className="luxury-card p-8 text-center max-w-md">
-          <h1 className="text-3xl font-serif text-[#C9A55C] mb-4">Sign In Required</h1>
+          <h1 className="text-3xl font-serif text-[#C9A55C] mb-4">
+            Sign In Required
+          </h1>
           <div className="w-24 h-[2px] bg-[#C9A55C] mx-auto mb-6"></div>
-          <p className="text-gray-300 mb-6">Please sign in to make a reservation</p>
+          <p className="text-gray-300 mb-6">
+            Please sign in to make a reservation
+          </p>
           <button
             onClick={() => router.push("/api/auth/signin")}
             className="luxury-button w-full"
@@ -314,7 +338,9 @@ export default function Reservations() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="luxury-card p-8 text-center">
             <div className="text-[#C9A55C] text-4xl mb-4">✓</div>
-            <p className="text-[#C9A55C] text-xl font-serif mb-2">Reservation successful!</p>
+            <p className="text-[#C9A55C] text-xl font-serif mb-2">
+              Reservation successful!
+            </p>
             <p className="text-gray-300 text-sm">
               Redirecting to your reservations...
             </p>
@@ -324,11 +350,11 @@ export default function Reservations() {
 
       <div className="luxury-section">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-serif text-[#C9A55C] mb-6">New Reservation</h1>
+          <h1 className="text-5xl font-serif text-[#C9A55C] mb-6">
+            New Reservation
+          </h1>
           <div className="w-24 h-[2px] bg-[#C9A55C] mx-auto mb-6"></div>
-          <p className="text-[#C9A55C] text-xl font-serif">
-            {hotelName}
-          </p>
+          <p className="text-[#C9A55C] text-xl font-serif">{hotelName}</p>
         </div>
 
         <div className="luxury-card p-8 space-y-8 max-w-2xl mx-auto">
@@ -364,9 +390,7 @@ export default function Reservations() {
             <button
               className="luxury-button w-full relative"
               onClick={makeReservation}
-              disabled={
-                !cid || !pickupDate || !returnDate || isLoading
-              }
+              disabled={!hid || !pickupDate || !returnDate || isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
